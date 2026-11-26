@@ -1,0 +1,44 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build Cordova APK
+        run: |
+          npm install -g cordova
+          cordova create app com.uztac.ratsya "UZ-TAC Ratsiya"
+          rm -rf app/www/*
+          cp index.html app/www/
+          cd app
+          cordova platform add android
+          cordova plugin add cordova-plugin-android-permissions
+          cordova plugin add https://github.com/EddyVerbruggen/Insomnia-PhoneGap-Plugin.git
+          cordova build android
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: UZTAC-Ratsiya-APK
+          path: app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
