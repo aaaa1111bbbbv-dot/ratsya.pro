@@ -32,6 +32,11 @@ jobs:
           cordova platform add android
           cordova plugin add cordova-plugin-android-permissions
           cordova plugin add https://github.com/EddyVerbruggen/Insomnia-PhoneGap-Plugin.git
+
+          # AndroidManifest.xml ga mikrofon va audio ruxsatlarini majburiy qo'shish
+          MANIFEST="platforms/android/app/src/main/AndroidManifest.xml"
+          sed -i 's|<application|<uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.MICROPHONE" />\n    <application|' $MANIFEST
+
           cordova build android
 
       - name: Upload APK
